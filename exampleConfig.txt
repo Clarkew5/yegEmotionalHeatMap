@@ -1,0 +1,5 @@
+[DEFAULT]
+access_token = GET YOUR OWN ACCESS TOKEN
+access_token_secret = GET YOUR OWN ACCESS TOKEN SECRET
+consumer_key = GET YOUR OWN API KEY
+consumer_secret = GET YOUR OWN API SECRET
