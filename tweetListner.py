@@ -14,14 +14,20 @@ consumer_key = "CONSUMER KEY NOT SET"
 consumer_secret = "CONSUMER SECERET NOT SET"
 
 style.use('fivethirtyeight')
-fig = plt.figure()
-ax1 = fig.add_subplot(1,1,1)
-ax1.set_autoscaley_on(True)
+fig, (ax1, ax2) = plt.subplots(2, 1, sharex=True)
+#fig = plt.figure()
+#ax1 = fig.add_subplot(1,1,1)
+#ax2 = fig.add_subplot(2,2,2)
+#ax1.set_autoscaley_on(True)
+#ax2.set_autoscaley_on(True)
 
 x = []
 ypos = []
 yneg = []
 yneut = []
+yposD = []
+ynegD = []
+yneutD = []
 
 def readConfig(FileName):
     config = configparser.ConfigParser()
@@ -37,12 +43,18 @@ def readConfig(FileName):
 
 def animate(i):
     ax1.clear()
+    ax2.clear()
     ax1.plot(x, ypos, 'g', x, yneg, 'r', x, yneut, 'k')
+    ax2.plot(x, yposD, 'g', x, ynegD, 'r', x, yneutD, 'k')
 
 class StdOutListener(tweepy.StreamListener):
     numOfTweets = 0
     places = {}
     Canada = {'numPos':0, 'numNeg':0, 'numNeut':0, 'queue':deque(),}
+
+    numPosLast = 0
+    numNegLast = 0
+    numNeutLast = 0
 
     ani = animation.FuncAnimation(fig, animate, interval=1000)
     plt.ion()
@@ -99,19 +111,38 @@ class StdOutListener(tweepy.StreamListener):
             x.pop(0)
         x.append(self.numOfTweets)
 
+        if len(yposD) >= 100:
+            yposD.pop(0)
+        yposD.append(self.Canada['numPos'] - self.numPosLast)
+
+        if len(ynegD) >= 100:
+            ynegD.pop(0)
+        ynegD.append(self.Canada['numNeg'] - self.numNegLast)
+
+        if len(yneutD) >= 100:
+            yneutD.pop(0)
+        yneutD.append(self.Canada['numNeut'] - self.numNeutLast)
+
         if len(ypos) >= 100:
             ypos.pop(0)
         ypos.append(self.Canada['numPos'])
+        self.numPosLast = self.Canada['numPos']
 
         if len(yneg) >= 100:
             yneg.pop(0)
         yneg.append(self.Canada['numNeg'])
+        self.numNegLast = self.Canada['numNeg']
 
         if len(yneut) >= 100:
             yneut.pop(0)
         yneut.append(self.Canada['numNeut'])
-        ax1.relim()
-        ax1.autoscale_view(True,True,True)
+        self.numNeutLast = self.Canada['numNeut']
+
+
+        #ax1.relim()
+        #ax1.autoscale_view(True,True,True)
+        #ax2.relim()
+        #ax2.autoscale_view(True,True,True)
         plt.draw()
         plt.pause(0.01)
 
