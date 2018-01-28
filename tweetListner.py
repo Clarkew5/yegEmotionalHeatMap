@@ -41,4 +41,4 @@ if (__name__ == '__main__'):
         api = tweepy.API(auth)
         stream = tweepy.Stream(auth=api.auth, listener=listener)
 
-        stream.filter(track = ['HackED2018', 'UofA', 'Edmonton'])
+        stream.filter(locations=[-113.690643, 53.406667, -113.332214, 53.661323])
