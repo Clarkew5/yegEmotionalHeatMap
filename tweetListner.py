@@ -49,7 +49,7 @@ class StdOutListener(tweepy.StreamListener):
 
     def on_data(self, data):
         j = json.loads(data)
-        if j['place']['country'] != 'Canada':
+        if j['place'] == None or j['place']['country'] != 'Canada':
             return
         place = j['place']['full_name']
 
@@ -75,17 +75,17 @@ class StdOutListener(tweepy.StreamListener):
                 self.Canada['numNeut'] -= 1
 
         sentiment = TextBlob(j['text']).sentiment.polarity
-        if sentiment > 0.33:
+        if sentiment > 0:
             self.places[place]['numPos'] += 1
             self.places[place]['queue'].append(1)
             self.Canada['numPos'] += 1
             self.Canada['queue'].append(1)
-        elif sentiment < -0.33:
+        elif sentiment < 0:
             self.places[place]['numNeg'] += 1
             self.places[place]['queue'].append(-1)
             self.Canada['numNeg'] += 1
             self.Canada['queue'].append(-1)
-        elif sentiment <= 0.33 and sentiment >= -0.33:
+        elif sentiment <= 0 and sentiment >= 0:
             self.places[place]['numNeut'] += 1
             self.places[place]['queue'].append(0)
             self.Canada['numNeut'] += 1
@@ -106,11 +106,10 @@ class StdOutListener(tweepy.StreamListener):
         if len(yneg) >= 100:
             yneg.pop(0)
         yneg.append(self.Canada['numNeg'])
-        
+
         if len(yneut) >= 100:
             yneut.pop(0)
         yneut.append(self.Canada['numNeut'])
-        print(x)
         ax1.relim()
         ax1.autoscale_view(True,True,True)
         plt.draw()
