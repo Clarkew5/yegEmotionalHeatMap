@@ -2,6 +2,7 @@ import tweepy
 import configparser
 import sys
 import json
+from textblob import TextBlob
 
 access_token = "ACCESS TOKEN NOT SET"
 access_token_secret = "ACCESS TOKEN SECRET NOT SET"
@@ -21,11 +22,17 @@ def readConfig(FileName):
     consumer_secret = config['DEFAULT']['consumer_secret']
 
 class StdOutListener(tweepy.StreamListener):
-
     def on_data(self, data):
         j = json.loads(data)
         text = j['text']
+        if j['place']['country'] != 'Canada':
+            return
+        if j['geo'] != None :
+            geo = j['geo']['coordinates']
+        else:
+            geo = None
         print(text)
+        print(j['place']['full_name'], TextBlob(text).sentiment.polarity, '\n')
 
     def on_error(self, status):
         print('Error: ' + str(status))
@@ -40,5 +47,4 @@ if (__name__ == '__main__'):
         auth.set_access_token(access_token, access_token_secret)
         api = tweepy.API(auth)
         stream = tweepy.Stream(auth=api.auth, listener=listener)
-
-        stream.filter(locations=[-113.690643, 53.406667, -113.332214, 53.661323])
+        stream.filter(locations=[-141.561094, 41.676329, -51.053519, 89.9999])
